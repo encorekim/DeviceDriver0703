@@ -1,6 +1,7 @@
+#include <stdexcept>
+
 #include "device_driver.h"
 #include "gmock/gmock.h"
-#include <stdexcept>
 
 using namespace testing;
 
@@ -10,21 +11,26 @@ class MockFlashMemory : public FlashMemoryDevice {
   MOCK_METHOD(void, write, (long address, unsigned char data), (override));
 };
 
-TEST(DeviceDriver, ReadFromHW) {
-  MockFlashMemory hardware;
-  EXPECT_CALL(hardware, read(_)).WillRepeatedly(Return(0));
-  DeviceDriver driver{&hardware};
+class DeviceDriverFixture : public Test {
+ public:
+  MockFlashMemory HARDWARE;
+
+ private:
+};
+
+TEST_F(DeviceDriverFixture, ReadFromHW) {
+  EXPECT_CALL(HARDWARE, read(_)).Times(5).WillRepeatedly(Return(0));
+  DeviceDriver driver{&HARDWARE};
   int data = driver.read(0xFF);
   EXPECT_EQ(0, data);
 }
 
-TEST(DeviceDriver, READFAIL) {
-  MockFlashMemory hardware;
-  EXPECT_CALL(hardware, read(_))
+TEST_F(DeviceDriverFixture, READFAIL) {
+  EXPECT_CALL(HARDWARE, read(_))
       .WillOnce(Return(0))
       .WillOnce(Return(1))
       .WillRepeatedly(Return(0));
-  DeviceDriver driver{&hardware};
+  DeviceDriver driver{&HARDWARE};
   EXPECT_THROW(driver.read(0xFF), ReadFailException);
 }
 
