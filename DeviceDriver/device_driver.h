@@ -11,6 +11,15 @@ class ReadFailException : public std::exception {
   std::string message;
 };
 
+class WriteFailException : public std::exception {
+ public:
+  explicit WriteFailException(const std::string& message) : message{message} {}
+  const char* what() const noexcept override { return message.c_str(); }
+
+ private:
+  std::string message;
+};
+
 class DeviceDriver {
  public:
   DeviceDriver(FlashMemoryDevice* hardware);
