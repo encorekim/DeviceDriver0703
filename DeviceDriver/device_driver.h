@@ -19,4 +19,5 @@ class DeviceDriver {
 
  protected:
   FlashMemoryDevice* m_hardware;
+  void verifyResult(int result, long address);
 };

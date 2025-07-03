@@ -8,15 +8,19 @@ DeviceDriver::DeviceDriver(FlashMemoryDevice* hardware)
 
 int DeviceDriver::read(long address) {
   int result = (int)(m_hardware->read(address));
-  for (int i = 0; i < 4; i++) {
-    if (result != (int)(m_hardware->read(address))) {
-      throw(ReadFailException("Read Failed"));
-    }
-  }
+  verifyResult(result, address);
   return result;
 }
 
 void DeviceDriver::write(long address, int data) {
   // TODO: implement this method
   m_hardware->write(address, (unsigned char)data);
+}
+
+void DeviceDriver::verifyResult(int result, long address) {
+  for (int i = 0; i < 4; i++) {
+    if (result != (int)(m_hardware->read(address))) {
+      throw(ReadFailException("Read Failed"));
+    }
+  }
 }
