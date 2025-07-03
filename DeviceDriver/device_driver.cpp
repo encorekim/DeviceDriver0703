@@ -8,18 +8,22 @@ DeviceDriver::DeviceDriver(FlashMemoryDevice* hardware)
 
 int DeviceDriver::read(long address) {
   int result = (int)(m_hardware->read(address));
-  verifyResult(result, address);
+  verifyRead(result, address);
   return result;
 }
 
 void DeviceDriver::write(long address, int data) {
-  if (read(address) != 0xFF) {
-    throw(WriteFailException("Write Failed"));
-  }
+  checkAddressEmpty(address);
   m_hardware->write(address, (unsigned char)data);
 }
 
-void DeviceDriver::verifyResult(int result, long address) {
+void DeviceDriver::checkAddressEmpty(long address) {
+  if (read(address) != 0xFF) {
+    throw(WriteFailException("Write Failed"));
+  }
+}
+
+void DeviceDriver::verifyRead(int result, long address) {
   for (int i = 0; i < 4; i++) {
     if (result != (int)(m_hardware->read(address))) {
       throw(ReadFailException("Read Failed"));
